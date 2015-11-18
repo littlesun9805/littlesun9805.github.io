@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Jump Jump</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="600"></canvas>
+<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+<embed src="http://music.163.com/style/swf/widget.swf?sid=29947420&type=2&auto=1&width=320&height=66" width="340" height="86"  allowNetworking="all"></embed>
+<script>
+var brave = prompt("Set your goal!");
+if (brave !== null) {
+	number = brave;
+} else {
+	brave = 30;
+}
+var hjh = new Image();
+hjh.src = "https://lh4.googleusercontent.com/-cZ86peukyVg/VkvfhJT25LI/AAAAAAAAAAw/qL8fF-xzDYk/w1012-h1232-no/hjjh.jpg"
+var hjh_tracker = 0;
+var bgimage = new Image();
+bgimage.src = "http://img5.duitang.com/uploads/item/201505/22/20150522120751_4d5nG.thumb.224_0.jpeg";
+var heart = new Image();
+heart.src = "http://img.sccnn.com/bimg/333/563.jpg";
+var changepic = function(){
+      if( hjh_tracker === 1) {
+      hjh.src = "https://lh6.googleusercontent.com/-GQKxpiRiLBw/VkvotauNPDI/AAAAAAAAAB0/dpmWg43HgZ0/w894-h1244-no/IMG_3622.JPG"
+      	} else if(hjh_tracker === 2) {
+      		hjh.src = "https://lh3.googleusercontent.com/-VpP2IIGxhZY/VkvouS3MVZI/AAAAAAAAAB0/xcN-Dsoz0Mw/w1544-h1158-no/IMG_3623.JPG"
+      	} else if (hjh_tracker === 3) {
+      		hjh.src = "https://lh6.googleusercontent.com/-nnBwEnecgr8/VkvouoZ93yI/AAAAAAAAAB0/u3kbn2yChCY/w1052-h1678-no/IMG_3624.JPG"
+      	} else if (hjh_tracker === 0) {
+      		hjh.src = "https://lh4.googleusercontent.com/-cZ86peukyVg/VkvfhJT25LI/AAAAAAAAAAw/qL8fF-xzDYk/w1012-h1232-no/hjjh.jpg"
+      	}
+}
+var clicktimes = function () {
+	hjh_tracker ++;
+	if (hjh_tracker > 3) {
+		hjh_tracker = 0;
+	}
+    changepic();
+}
+$("html").click(clicktimes);
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var width = canvas.width;
+var height = canvas.height;
+var times = 1;
+var time = 0;
+var colornumber1 = 0;
+var colornumber2 = 0;
+var colornumber3 = 0;
+var colornumber4 = 0;
+var color = ["#6495ED","#6495ED","#663399","#663399","#DC143C","#DC143C","#B0C4DE","#B0C4DE","#FF4500","#FF4500","#8A2BE2","#8A2BE2"];
+var score = 0;
+var drawScore = function () {
+	ctx.font = "30px Courier";
+	ctx.fillStyle = "Black";
+	ctx.textAlign = "left";
+	ctx.textBaseline = "top";
+	ctx.fillText("Score:"+ score,10,10);
+};
+var circle = function(x,y,radius,fillcircle) {
+	ctx.beginPath();
+	ctx.arc(x,y,radius,0,Math.PI * 2,false);
+	ctx.fill();
+}
+var gameOver = function () {
+    ctx.fillStyle = "Black";
+    clearInterval(intervalid);
+    ctx.clearRect(0,0,width,height);
+    ctx.fillRect(0,0,width,height);
+    changepic();
+    ctx.drawImage(hjh,100,50,200,240);
+}
+var overText = function () {
+	ctx.font = "60px Courier";
+	ctx.fillStyle = "white";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText("Game over",width/2,height/2 + 100);    
+}
+var Ball = function () {
+	this.x = width/2;
+	this.y = height/2;
+	this.radius = 10;
+	this.xSpeed = 0;
+	this.ySpeed = 0;
+	this.yAccelerate = 1;
+}
+Ball.prototype.draw = function () {
+     ctx.fillStyle = "Black";
+     circle(this.x,this.y,this.radius,true)
+	}    
+Ball.prototype.move = function () {
+	this.ySpeed += this.yAccelerate;
+	this.x += this.xSpeed;
+	this.y += this.ySpeed;
+	this.yAccelerate = 1;
+	this.xSpeed = 0;
+	if (this.x < 0) {
+		this.x = width;
+	} else if (this.x > width) {
+		this.x = 0;
+	}
+	if (this.y > height - 10) {
+        this.y = height - 10;
+    }
+}
+Ball.prototype.jump = function (direction) {
+	if (direction === "left") {
+		this.xSpeed = -20;
+		this.ySpeed = -10;
+	}
+	if (direction === "right") {
+        this.xSpeed = 20;
+		this.ySpeed = -10;
+	}
+} 
+var m = 0;
+var Barrier = function () {
+	this.i = Math.random() * 300;
+	this.ii = Math.random() * 300;
+	this.iii = Math.random() * 40;
+	this.iiii = Math.random() * 40;
+	this.o = this.i;
+	this.oo = this.ii;
+	this.y = 0;
+	this.yy = 0;
+	this.yyy = 0;
+	this.yyyy = 0;
+}
+Barrier.prototype.draw = function () {
+    ctx.drawImage(bgimage,0,0,width,height);
+	ctx.fillStyle = color[colornumber1];
+	ctx.fillRect(0,this.y,this.i,20);
+	ctx.fillRect(this.i + 100,this.y,300 - this.i,20);
+	if (m > 15 * 3) {
+	ctx.fillStyle = color[colornumber3];
+	ctx.fillRect(this.o + 30 + this.iii,this.yyy,20,20)
+	};
+	if (m > 30 * 3) {
+	ctx.fillStyle = color[colornumber2];
+	ctx.fillRect(0,this.yy,this.ii,20);
+	ctx.fillRect(this.ii + 100,this.yy,300 - this.ii,20)
+	};
+	if (m > 45 * 3) {
+	ctx.fillStyle = color[colornumber4];
+	ctx.fillRect(this.oo + 30 + this.iiii,this.yyyy,20,20)
+	};	
+}
+Barrier.prototype.move = function () {
+	this.y += 10/3;
+	m ++;
+	if (m > 15 * 3) {
+		this.yyy += 10/3;
+	};
+	if (m > 30 * 3) {
+		this.yy += 10/3;
+	};
+	if (m > 45 * 3) {
+		this.yyyy += 10/3;
+	};
+	if (this.y > height) {
+		this.y = 0;
+		this.i = Math.random() * 300;
+		times = 1;
+		colornumber1 += 1;
+    };
+    if (this.yyy > height) {
+    	this.yyy = 0;
+    	this.iii = Math.random() * 40;
+    	this.o = this.i;
+    	colornumber3 += 1
+    };
+    if (this.yy > height) {
+		this.yy = 0;
+        this.ii = Math.random() * 300;
+        time = 0
+        colornumber2 += 1
+	};
+	if (this.yyyy > height) {
+    	this.yyyy = 0
+    	this.iiii = Math.random() * 40; 
+    	this.oo =this.ii;
+    	colornumber4 += 1  
+    };
+    if (colornumber1 > 12) {
+    	colornumber1 = 0;
+    }
+    if (colornumber2 > 12) {
+    	colornumber2 = 0;
+    }
+    if (colornumber3 > 12) {
+    	colornumber3 = 0;
+    }
+    if (colornumber4 > 12) {
+    	colornumber4 = 0;
+    }
+}
+var check = function () {
+	if (ball.y - ball.radius < barrier.y +20 && ball.y + ball.radius > barrier.y && (ball.x < barrier.i || ball.x > barrier.i + 100)) {
+		gameOver();
+		overText();
+	}
+	if ((ball.x - ball.radius < barrier.i || ball.x + ball.radius > barrier.i + 100) && (ball.y > barrier.y && ball.y < barrier.y + 20)) {
+		gameOver();
+		overText();
+	}
+	if (ball.y - ball.radius < barrier.yyy + 20 && ball.y + ball.radius > barrier.yyy && ball.x < barrier.o + 50 + barrier.iii && ball.x > barrier.o + 30 + barrier.iii) {
+        gameOver();
+        overText();
+	}
+	if ((ball.x + ball.radius > barrier.o + 30 + barrier.iii && ball.x - ball.radius < barrier.o + 50 + barrier.iii) && (ball.y > barrier.yyy && ball.y < barrier.yyy + 20)) {
+		gameOver();
+		overText();
+	}
+	if (ball.y + ball.radius > barrier.yyy && ball.y + ball.radius < ball.yyy + 20 && ball.x < barrier.o + 50 + barrier.iii && ball.x > barrier.o + 30 + barrier.iii) {
+		gameOver();
+		overText();
+	}
+	if (ball.y - ball.radius < barrier.yy + 20 && ball.y + ball.radius > barrier.yy && (ball.x < barrier.ii || ball.x > barrier.ii + 100)) {
+		gameOver();
+		overText();
+	}
+	if ((ball.x - ball.radius < barrier.ii || ball.x + ball.radius > barrier.ii + 100) && (ball.y > barrier.yy && ball.y < barrier.yy + 20)) {
+		gameOver();
+		overText();
+	}
+	if (ball.y - ball.radius < barrier.yyyy + 20 && ball.y - ball.radius > barrier.yyyy && ball.x < barrier.oo + 50 + barrier.iiii && ball.x > barrier.oo + 30 + barrier.iiii) {
+		gameOver();
+		overText();
+	}
+	if ((ball.x + ball.radius > barrier.oo + 30 + barrier.iiii && ball.x - ball.radius < barrier.oo + 50 + barrier.iiii) && (ball.y > barrier.yyyy && ball.y < barrier.yyyy + 20)) {
+		gameOver();
+		overText();
+	}
+	if (ball.y + ball.radius > barrier.yyyy && ball.y + ball.radius < barrier.yyyy - 20 && ball.x < barrier.oo + 50 + barrier.iiii && ball.x > barrier.oo + 30 + barrier.iiii) {
+		gameOver();
+		overText();
+	}
+	if (ball.y < barrier.y && times === 1 ) {
+		score ++ ;
+		times -- ;
+	}
+	if (ball.y < barrier.yy && time === 0) {
+		score ++;
+		time ++;
+	}
+	if (score >= brave) {
+		victory();
+	}
+}
+var victory = function() {
+	ctx.font = "60px Palatino Linotype";
+	ctx.fillStyle = "Pink";
+	clearInterval(intervalid);
+    ctx.clearRect(0,0,width,height);
+    ctx.drawImage(heart,50,50,300,300);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Victory",width/2,height/2 + 175);
+    ctx.strokeRect(0,0,width,height);
+}
+var barrier = new Barrier();
+var ball = new Ball();
+var keyAction = {
+	37:"left",
+	39:"right"
+}
+$("body").keydown(function(event){
+	direction = keyAction[event.keyCode];
+	ball.jump(direction);
+})
+var intervalid = setInterval(function() {
+ctx.clearRect(0,0,width,height);
+barrier.draw();
+barrier.move();
+ball.draw();
+ball.move();
+ball.jump();
+drawScore();
+ctx.strokeRect(0,0,width,height);
+check();
+},30)
+</script>
+</body>
+</html>
